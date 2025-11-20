@@ -71,6 +71,7 @@ export function GameBoard({ gameState, onCardClick, onNewGame, isProcessing }: G
           return (
             <UICard
               key={player.index}
+              id={`player-box-${player.index}`}
               className={cn(
                 'relative z-10 bg-white',
                 currentPlayer.index === player.index && !isGameComplete
@@ -175,6 +176,9 @@ export function GameBoard({ gameState, onCardClick, onNewGame, isProcessing }: G
                   : gameState.cards.length > 26
                     ? 'medium'
                     : 'medium'
+              }
+              playerBoxId={
+                card.claimedByPlayer !== -1 ? `player-box-${card.claimedByPlayer}` : undefined
               }
               disabled={
                 isProcessing ||

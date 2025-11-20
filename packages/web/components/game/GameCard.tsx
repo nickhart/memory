@@ -3,17 +3,27 @@
 import { Card as GameCard } from '@memory/game-logic';
 import { getCardDisplay } from '@memory/game-logic';
 import { cn } from '@/lib/utils';
+import { useState, useEffect } from 'react';
 
 interface GameCardProps {
   card: GameCard;
   onClick?: () => void;
   disabled?: boolean;
   size?: 'small' | 'medium' | 'large';
+  playerBoxId?: string;
 }
 
-export function PlayingCard({ card, onClick, disabled = false, size = 'medium' }: GameCardProps) {
+export function PlayingCard({
+  card,
+  onClick,
+  disabled = false,
+  size = 'medium',
+  playerBoxId,
+}: GameCardProps) {
   const isRevealed = card.isFaceUp;
   const isClaimed = card.claimedByPlayer !== -1;
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [animationStyle, setAnimationStyle] = useState<React.CSSProperties>({});
 
   // Size configurations
   const sizeClasses = {
@@ -28,8 +38,38 @@ export function PlayingCard({ card, onClick, disabled = false, size = 'medium' }
     large: { back: 'text-4xl sm:text-5xl', front: 'text-3xl sm:text-4xl' },
   };
 
+  // Handle animation when card is claimed
+  useEffect(() => {
+    if (isClaimed && !isAnimating && playerBoxId) {
+      // Use requestAnimationFrame to defer state update
+      requestAnimationFrame(() => {
+        setIsAnimating(true);
+
+        // Get the card's current position
+        const cardElement = document.getElementById(`card-${card.id}`);
+        const targetElement = document.getElementById(playerBoxId);
+
+        if (cardElement && targetElement) {
+          const cardRect = cardElement.getBoundingClientRect();
+          const targetRect = targetElement.getBoundingClientRect();
+
+          // Calculate the translation needed
+          const deltaX =
+            targetRect.left - cardRect.left + targetRect.width / 2 - cardRect.width / 2;
+          const deltaY =
+            targetRect.top - cardRect.top + targetRect.height / 2 - cardRect.height / 2;
+
+          setAnimationStyle({
+            transform: `translate(${deltaX}px, ${deltaY}px) scale(0.3)`,
+            opacity: 0,
+          });
+        }
+      });
+    }
+  }, [isClaimed, card.id, playerBoxId, isAnimating]);
+
   // Animate claimed cards - fade and scale down
-  if (isClaimed) {
+  if (isClaimed && !playerBoxId) {
     return (
       <div className={sizeClasses[size]}>
         <div className="h-full w-full scale-50 opacity-0 transition-all duration-700" />
@@ -37,19 +77,33 @@ export function PlayingCard({ card, onClick, disabled = false, size = 'medium' }
     );
   }
 
+  if (isClaimed && isAnimating) {
+    return (
+      <div className={sizeClasses[size]}>
+        <div className="h-full w-full opacity-0" />
+      </div>
+    );
+  }
+
   return (
     <div
+      id={`card-${card.id}`}
       onClick={!disabled && !isRevealed ? onClick : undefined}
       className={cn(
         'group relative',
         sizeClasses[size],
         'cursor-pointer transition-transform duration-300',
         {
-          'hover:scale-105': !disabled && !isRevealed,
+          'hover:scale-105': !disabled && !isRevealed && !isClaimed,
           'cursor-not-allowed': disabled && !isRevealed,
         }
       )}
-      style={{ perspective: '1000px' }}
+      style={{
+        perspective: '1000px',
+        ...(isClaimed && isAnimating
+          ? { zIndex: 50, transition: 'all 0.8s ease-in-out', ...animationStyle }
+          : {}),
+      }}
     >
       <div
         className={cn(
