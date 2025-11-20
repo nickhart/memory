@@ -12,6 +12,9 @@
     "clean": "rm -rf .next"
   },
   "dependencies": {
+    "@memory/blackjack": "workspace:*",
+    "@memory/card-game-core": "workspace:*",
+    "@memory/card-game-ui": "workspace:*",
     "@memory/game-logic": "workspace:*",
     "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-slot": "^1.2.4",
