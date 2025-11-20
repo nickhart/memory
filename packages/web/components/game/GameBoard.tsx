@@ -146,10 +146,19 @@ export function GameBoard({ gameState, onCardClick, onNewGame, isProcessing }: G
 
       {/* Game Board */}
       <div
-        className="mx-auto grid gap-3"
+        className={cn('mx-auto grid', {
+          'gap-2': gameState.cards.length > 52,
+          'gap-2.5': gameState.cards.length > 26 && gameState.cards.length <= 52,
+          'gap-3': gameState.cards.length <= 26,
+        })}
         style={{
-          gridTemplateColumns: `repeat(auto-fit, minmax(4rem, 1fr))`,
-          maxWidth: '800px',
+          gridTemplateColumns:
+            gameState.cards.length > 52
+              ? 'repeat(auto-fit, minmax(3rem, 1fr))'
+              : gameState.cards.length > 26
+                ? 'repeat(auto-fit, minmax(3.5rem, 1fr))'
+                : 'repeat(auto-fit, minmax(4rem, 1fr))',
+          maxWidth: gameState.cards.length > 52 ? '1200px' : '1000px',
         }}
       >
         {gameState.cards
@@ -160,6 +169,13 @@ export function GameBoard({ gameState, onCardClick, onNewGame, isProcessing }: G
               key={card.id}
               card={card}
               onClick={() => onCardClick(card)}
+              size={
+                gameState.cards.length > 52
+                  ? 'small'
+                  : gameState.cards.length > 26
+                    ? 'medium'
+                    : 'medium'
+              }
               disabled={
                 isProcessing ||
                 currentPlayer.type === 'ai' ||
