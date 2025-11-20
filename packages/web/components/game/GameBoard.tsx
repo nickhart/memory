@@ -1,11 +1,10 @@
 'use client';
 
-import { GameState, Card } from '@memory/game-logic';
+import { GameState, Card, getGameStats, getCardDisplay } from '@memory/game-logic';
 import { PlayingCard } from './GameCard';
 import { Card as UICard, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { getGameStats } from '@memory/game-logic';
 
 interface GameBoardProps {
   gameState: GameState;
@@ -64,32 +63,58 @@ export function GameBoard({ gameState, onCardClick, onNewGame, isProcessing }: G
 
       {/* Players */}
       <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        {gameState.players.map((player, index) => (
-          <UICard
-            key={player.index}
-            className={
-              currentPlayer.index === player.index && !isGameComplete
-                ? 'border-2 border-primary shadow-lg'
-                : ''
-            }
-          >
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <div className={`h-3 w-3 rounded-full ${getPlayerColor(index)}`} />
-                <span className="font-medium">{player.name}</span>
-                {player.type === 'ai' && (
-                  <Badge variant="outline" className="text-xs">
-                    AI
-                  </Badge>
+        {gameState.players.map((player, index) => {
+          const collectedCards = gameState.cards.filter(
+            (card) => card.claimedByPlayer === player.index
+          );
+          return (
+            <UICard
+              key={player.index}
+              className={
+                currentPlayer.index === player.index && !isGameComplete
+                  ? 'border-2 border-primary shadow-lg'
+                  : ''
+              }
+            >
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2">
+                  <div className={`h-3 w-3 rounded-full ${getPlayerColor(index)}`} />
+                  <span className="font-medium">{player.name}</span>
+                  {player.type === 'ai' && (
+                    <Badge variant="outline" className="text-xs">
+                      AI
+                    </Badge>
+                  )}
+                </div>
+                <div className="mt-2 flex items-baseline gap-2">
+                  <p className="text-2xl font-bold">{player.matchesClaimed}</p>
+                  <p className="text-xs text-gray-500">
+                    ({stats.playerStats[index].percentage.toFixed(0)}%)
+                  </p>
+                </div>
+                {/* Show collected cards */}
+                {collectedCards.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    {collectedCards.slice(0, 6).map((card) => (
+                      <div
+                        key={card.id}
+                        className="flex h-6 w-6 items-center justify-center rounded border bg-white text-xs shadow-sm"
+                        title={getCardDisplay(card)}
+                      >
+                        {getCardDisplay(card)}
+                      </div>
+                    ))}
+                    {collectedCards.length > 6 && (
+                      <div className="flex h-6 w-6 items-center justify-center text-xs text-gray-500">
+                        +{collectedCards.length - 6}
+                      </div>
+                    )}
+                  </div>
                 )}
-              </div>
-              <p className="mt-2 text-2xl font-bold">{player.matchesClaimed}</p>
-              <p className="text-xs text-gray-500">
-                {stats.playerStats[index].percentage.toFixed(1)}%
-              </p>
-            </CardContent>
-          </UICard>
-        ))}
+              </CardContent>
+            </UICard>
+          );
+        })}
       </div>
 
       {/* Current Turn Info */}

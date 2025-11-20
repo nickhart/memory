@@ -1,7 +1,6 @@
 'use client';
 
 import { Card as GameCard } from '@memory/game-logic';
-import { Card } from '@/components/ui/card';
 import { getCardDisplay } from '@memory/game-logic';
 import { cn } from '@/lib/utils';
 
@@ -12,41 +11,60 @@ interface GameCardProps {
 }
 
 export function PlayingCard({ card, onClick, disabled = false }: GameCardProps) {
-  const isRevealed = card.isFaceUp || card.claimedByPlayer !== -1;
+  const isRevealed = card.isFaceUp;
   const isClaimed = card.claimedByPlayer !== -1;
 
-  const getPlayerColor = (playerIndex: number) => {
-    const colors = [
-      'border-blue-500 bg-blue-50',
-      'border-red-500 bg-red-50',
-      'border-green-500 bg-green-50',
-      'border-yellow-500 bg-yellow-50',
-    ];
-    return colors[playerIndex] || 'border-gray-500 bg-gray-50';
-  };
+  // Don't render claimed cards - they'll be shown in the player's collection
+  if (isClaimed) {
+    return <div className="h-24 w-16 opacity-0 transition-all duration-500 sm:h-32 sm:w-24" />;
+  }
 
   return (
-    <Card
+    <div
       onClick={!disabled && !isRevealed ? onClick : undefined}
       className={cn(
-        'relative flex h-24 w-16 cursor-pointer items-center justify-center text-2xl transition-all duration-300 sm:h-32 sm:w-24',
+        'group relative h-24 w-16 sm:h-32 sm:w-24',
+        'cursor-pointer transition-transform duration-300',
         {
-          'hover:scale-105 hover:shadow-lg': !disabled && !isRevealed,
-          'cursor-not-allowed opacity-50': disabled && !isRevealed,
-          [getPlayerColor(card.claimedByPlayer)]: isClaimed,
-          'border-2': isClaimed,
+          'hover:scale-105': !disabled && !isRevealed,
+          'cursor-not-allowed': disabled && !isRevealed,
         }
       )}
+      style={{ perspective: '1000px' }}
     >
-      {isRevealed ? (
-        <span className={cn('text-3xl sm:text-4xl', { 'opacity-50': isClaimed })}>
-          {getCardDisplay(card)}
-        </span>
-      ) : (
-        <div className="flex h-full w-full items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
+      <div
+        className={cn(
+          'relative h-full w-full transition-transform duration-500',
+          'transform-style-3d',
+          {
+            'rotate-y-180': isRevealed,
+          }
+        )}
+        style={{ transformStyle: 'preserve-3d' }}
+      >
+        {/* Back of card (face down) */}
+        <div
+          className={cn(
+            'absolute inset-0 flex items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg',
+            'backface-hidden',
+            { 'opacity-50': disabled }
+          )}
+          style={{ backfaceVisibility: 'hidden' }}
+        >
           <span className="text-4xl">?</span>
         </div>
-      )}
-    </Card>
+
+        {/* Front of card (face up) */}
+        <div
+          className="absolute inset-0 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white shadow-lg backface-hidden"
+          style={{
+            backfaceVisibility: 'hidden',
+            transform: 'rotateY(180deg)',
+          }}
+        >
+          <span className="text-3xl sm:text-4xl">{getCardDisplay(card)}</span>
+        </div>
+      </div>
+    </div>
   );
 }
