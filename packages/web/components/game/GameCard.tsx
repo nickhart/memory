@@ -32,8 +32,7 @@ export function PlayingCard({ card, onClick, disabled = false }: GameCardProps) 
         'relative flex h-24 w-16 cursor-pointer items-center justify-center text-2xl transition-all duration-300 sm:h-32 sm:w-24',
         {
           'hover:scale-105 hover:shadow-lg': !disabled && !isRevealed,
-          'cursor-not-allowed opacity-50': disabled,
-          'rotate-y-180': isRevealed,
+          'cursor-not-allowed opacity-50': disabled && !isRevealed,
           [getPlayerColor(card.claimedByPlayer)]: isClaimed,
           'border-2': isClaimed,
         }
@@ -44,7 +43,7 @@ export function PlayingCard({ card, onClick, disabled = false }: GameCardProps) 
           {getCardDisplay(card)}
         </span>
       ) : (
-        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
+        <div className="flex h-full w-full items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
           <span className="text-4xl">?</span>
         </div>
       )}

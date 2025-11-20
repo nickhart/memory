@@ -55,6 +55,9 @@ export function GameContainer() {
 
       let currentState = flipResult.updatedState;
 
+      // Update the state immediately so the UI reflects the flipped card
+      setGameState(currentState);
+
       // Update AI memory with the newly revealed card
       const updatedMemory = syncMemoryWithGameState(currentState, aiMemory);
       setAiMemory(updatedMemory);
@@ -73,7 +76,6 @@ export function GameContainer() {
           setIsProcessing(false);
         }, 1000);
       } else {
-        setGameState(currentState);
         setIsProcessing(false);
       }
     },

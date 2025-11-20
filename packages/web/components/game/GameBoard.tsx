@@ -124,7 +124,8 @@ export function GameBoard({ gameState, onCardClick, onNewGame, isProcessing }: G
                 isProcessing ||
                 currentPlayer.type === 'ai' ||
                 isGameComplete ||
-                gameState.currentlyFlippedCards.length >= gameState.config.matchSize
+                (gameState.currentlyFlippedCards.length >= gameState.config.matchSize &&
+                  !card.isFaceUp)
               }
             />
           ))}
