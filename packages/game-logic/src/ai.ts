@@ -45,13 +45,6 @@ export function removeClaimedFromMemory(memory: AIMemory, cards: Card[]): AIMemo
 }
 
 /**
- * Gets the card identity from memory
- */
-function getCardIdentity(card: Card): string {
-  return `${card.rank}:${card.suit}`;
-}
-
-/**
  * Gets the rank from a card identity
  */
 function getRankFromIdentity(identity: string): string {
@@ -77,7 +70,7 @@ export function findKnownMatch(state: GameState, memory: AIMemory): number[] | n
   });
 
   // Find a rank that has enough cards for a match
-  for (const [rank, positions] of rankGroups.entries()) {
+  for (const positions of rankGroups.values()) {
     if (positions.length >= matchSize) {
       // Verify all positions are still valid (cards not claimed)
       const validPositions = positions.filter((pos) =>

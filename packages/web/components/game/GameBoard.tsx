@@ -130,7 +130,7 @@ export function GameBoard({ gameState, onCardClick, onNewGame, isProcessing }: G
               </p>
             ) : (
               <p className="text-lg">
-                <strong>{currentPlayer.name}'s</strong> turn
+                <strong>{currentPlayer.name}&apos;s</strong> turn
                 {currentPlayer.type === 'ai' && <span className="ml-2">(AI is thinking...)</span>}
                 {gameState.currentlyFlippedCards.length > 0 && (
                   <span className="ml-2 text-sm text-gray-600">

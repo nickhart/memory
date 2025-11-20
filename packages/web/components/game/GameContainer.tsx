@@ -53,7 +53,7 @@ export function GameContainer() {
         return;
       }
 
-      let currentState = flipResult.updatedState;
+      const currentState = flipResult.updatedState;
 
       // Update the state immediately so the UI reflects the flipped card
       setGameState(currentState);

@@ -1,14 +1,5 @@
 import { createDeck, isMatch } from './card';
-import {
-  GameState,
-  GameConfig,
-  GameStatus,
-  Player,
-  PlayerType,
-  FlipResult,
-  Move,
-  Card,
-} from './types';
+import { GameState, GameConfig, GameStatus, Player, FlipResult, Move, Card } from './types';
 
 /**
  * Creates initial game state from configuration
@@ -111,7 +102,7 @@ export function checkAndProcessMatch(state: GameState): GameState {
   const currentPlayer = state.players[state.currentPlayerIndex];
 
   let newCards = [...state.cards];
-  let newPlayers = [...state.players];
+  const newPlayers = [...state.players];
 
   if (matched) {
     // Mark cards as claimed
