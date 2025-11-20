@@ -14,9 +14,13 @@ export function PlayingCard({ card, onClick, disabled = false }: GameCardProps) 
   const isRevealed = card.isFaceUp;
   const isClaimed = card.claimedByPlayer !== -1;
 
-  // Don't render claimed cards - they'll be shown in the player's collection
+  // Animate claimed cards - fade and scale down
   if (isClaimed) {
-    return <div className="h-24 w-16 opacity-0 transition-all duration-500 sm:h-32 sm:w-24" />;
+    return (
+      <div className="h-24 w-16 sm:h-32 sm:w-24">
+        <div className="h-full w-full scale-50 opacity-0 transition-all duration-700" />
+      </div>
+    );
   }
 
   return (

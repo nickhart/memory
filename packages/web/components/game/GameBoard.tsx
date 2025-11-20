@@ -5,6 +5,7 @@ import { PlayingCard } from './GameCard';
 import { Card as UICard, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface GameBoardProps {
   gameState: GameState;
@@ -70,13 +71,14 @@ export function GameBoard({ gameState, onCardClick, onNewGame, isProcessing }: G
           return (
             <UICard
               key={player.index}
-              className={
+              className={cn(
+                'relative z-10 bg-white',
                 currentPlayer.index === player.index && !isGameComplete
                   ? 'border-2 border-primary shadow-lg'
                   : ''
-              }
+              )}
             >
-              <CardContent className="p-4">
+              <CardContent className="p-4 bg-white">
                 <div className="flex items-center gap-2">
                   <div className={`h-3 w-3 rounded-full ${getPlayerColor(index)}`} />
                   <span className="font-medium">{player.name}</span>
