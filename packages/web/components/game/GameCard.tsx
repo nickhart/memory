@@ -23,6 +23,7 @@ export function PlayingCard({
   const isRevealed = card.isFaceUp;
   const isClaimed = card.claimedByPlayer !== -1;
   const [isAnimating, setIsAnimating] = useState(false);
+  const [animationComplete, setAnimationComplete] = useState(false);
   const [animationStyle, setAnimationStyle] = useState<React.CSSProperties>({});
 
   // Size configurations
@@ -43,11 +44,12 @@ export function PlayingCard({
     console.log(`[Card ${card.id}] Animation effect triggered`, {
       isClaimed,
       isAnimating,
+      animationComplete,
       playerBoxId,
       claimedByPlayer: card.claimedByPlayer,
     });
 
-    if (isClaimed && !isAnimating && playerBoxId) {
+    if (isClaimed && !isAnimating && !animationComplete && playerBoxId) {
       console.log(`[Card ${card.id}] Starting animation to ${playerBoxId}`);
 
       // Use requestAnimationFrame to defer state update
@@ -97,6 +99,12 @@ export function PlayingCard({
           };
           console.log(`[Card ${card.id}] Setting animation style:`, style);
           setAnimationStyle(style);
+
+          // After animation duration, mark as complete
+          setTimeout(() => {
+            console.log(`[Card ${card.id}] Animation complete, setting animationComplete`);
+            setAnimationComplete(true);
+          }, 800);
         } else {
           console.error(`[Card ${card.id}] Failed to find elements!`);
         }
@@ -105,12 +113,23 @@ export function PlayingCard({
       console.log(`[Card ${card.id}] Animation conditions not met`, {
         needsClaimed: isClaimed,
         needsNotAnimating: !isAnimating,
+        needsNotComplete: !animationComplete,
         needsPlayerBoxId: !!playerBoxId,
       });
     }
-  }, [isClaimed, card.id, playerBoxId, isAnimating, card.claimedByPlayer]);
+  }, [isClaimed, card.id, playerBoxId, isAnimating, animationComplete, card.claimedByPlayer]);
 
-  // Animate claimed cards - fade and scale down
+  // After animation completes, render as invisible
+  if (isClaimed && animationComplete) {
+    console.log(`[Card ${card.id}] Rendering: animation complete, invisible`);
+    return (
+      <div className={sizeClasses[size]}>
+        <div className="h-full w-full opacity-0" />
+      </div>
+    );
+  }
+
+  // Fallback for claimed cards without playerBoxId (shouldn't happen with current logic)
   if (isClaimed && !playerBoxId) {
     console.log(`[Card ${card.id}] Rendering: claimed but no playerBoxId, fading out`);
     return (
@@ -120,16 +139,12 @@ export function PlayingCard({
     );
   }
 
-  if (isClaimed && isAnimating) {
-    console.log(`[Card ${card.id}] Rendering: claimed and animating complete, invisible`);
-    return (
-      <div className={sizeClasses[size]}>
-        <div className="h-full w-full opacity-0" />
-      </div>
-    );
-  }
-
-  console.log(`[Card ${card.id}] Rendering: normal card`, { isRevealed, isClaimed, isAnimating });
+  console.log(`[Card ${card.id}] Rendering: normal card`, {
+    isRevealed,
+    isClaimed,
+    isAnimating,
+    animationComplete,
+  });
 
   return (
     <div
@@ -146,7 +161,7 @@ export function PlayingCard({
       )}
       style={{
         perspective: '1000px',
-        ...(isClaimed && isAnimating
+        ...(isClaimed && isAnimating && !animationComplete
           ? { zIndex: 50, transition: 'all 0.8s ease-in-out', ...animationStyle }
           : {}),
       }}
