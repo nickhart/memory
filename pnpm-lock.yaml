@@ -24,7 +24,93 @@ importers:
         specifier: ^5.3.0
         version: 5.9.3
 
+  packages/card-game-core:
+    devDependencies:
+      '@types/jest':
+        specifier: ^29.5.0
+        version: 29.5.14
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^6.0.0
+        version: 6.21.0(@typescript-eslint/parser@6.21.0)(eslint@8.57.1)(typescript@5.9.3)
+      '@typescript-eslint/parser':
+        specifier: ^6.0.0
+        version: 6.21.0(eslint@8.57.1)(typescript@5.9.3)
+      eslint:
+        specifier: ^8.0.0
+        version: 8.57.1
+      jest:
+        specifier: ^29.5.0
+        version: 29.7.0(@types/node@20.19.25)
+      ts-jest:
+        specifier: ^29.1.0
+        version: 29.4.5(@babel/core@7.28.5)(esbuild@0.27.0)(jest@29.7.0)(typescript@5.9.3)
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(typescript@5.9.3)
+      typescript:
+        specifier: ^5.3.0
+        version: 5.9.3
+
+  packages/card-game-ui:
+    dependencies:
+      '@memory/card-game-core':
+        specifier: workspace:*
+        version: link:../card-game-core
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+    devDependencies:
+      '@testing-library/jest-dom':
+        specifier: ^6.1.0
+        version: 6.9.1
+      '@testing-library/react':
+        specifier: ^14.1.0
+        version: 14.3.1(@types/react@19.2.6)(react-dom@19.2.0)(react@19.2.0)
+      '@types/jest':
+        specifier: ^29.5.0
+        version: 29.5.14
+      '@types/react':
+        specifier: ^19
+        version: 19.2.6
+      '@types/react-dom':
+        specifier: ^19
+        version: 19.2.3(@types/react@19.2.6)
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^6.0.0
+        version: 6.21.0(@typescript-eslint/parser@6.21.0)(eslint@8.57.1)(typescript@5.9.3)
+      '@typescript-eslint/parser':
+        specifier: ^6.0.0
+        version: 6.21.0(eslint@8.57.1)(typescript@5.9.3)
+      eslint:
+        specifier: ^8.0.0
+        version: 8.57.1
+      jest:
+        specifier: ^29.5.0
+        version: 29.7.0(@types/node@20.19.25)
+      jest-environment-jsdom:
+        specifier: ^29.5.0
+        version: 29.7.0
+      react:
+        specifier: ^19.0.0
+        version: 19.2.0
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.2.0(react@19.2.0)
+      ts-jest:
+        specifier: ^29.1.0
+        version: 29.4.5(@babel/core@7.28.5)(esbuild@0.27.0)(jest@29.7.0)(typescript@5.9.3)
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(typescript@5.9.3)
+      typescript:
+        specifier: ^5.3.0
+        version: 5.9.3
+
   packages/game-logic:
+    dependencies:
+      '@memory/card-game-core':
+        specifier: workspace:*
+        version: link:../card-game-core
     devDependencies:
       '@types/jest':
         specifier: ^29.5.0

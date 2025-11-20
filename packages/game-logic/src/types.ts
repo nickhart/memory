@@ -1,46 +1,15 @@
-/**
- * Card suits in a standard deck
- */
-export enum Suit {
-  Hearts = 'hearts',
-  Diamonds = 'diamonds',
-  Clubs = 'clubs',
-  Spades = 'spades',
-}
+import { BaseCard, Rank, Suit } from '@memory/card-game-core';
+
+// Re-export core types for convenience
+export { Rank, Suit };
 
 /**
- * Card ranks in a standard deck
+ * Represents a playing card in the memory game
+ * Extends the base card with memory-specific properties
  */
-export enum Rank {
-  Ace = 'A',
-  Two = '2',
-  Three = '3',
-  Four = '4',
-  Five = '5',
-  Six = '6',
-  Seven = '7',
-  Eight = '8',
-  Nine = '9',
-  Ten = '10',
-  Jack = 'J',
-  Queen = 'Q',
-  King = 'K',
-}
-
-/**
- * Represents a playing card in the game
- */
-export interface Card {
-  /** Unique identifier for this card instance */
-  id: string;
-  /** Card rank */
-  rank: Rank;
-  /** Card suit */
-  suit: Suit;
+export interface Card extends BaseCard {
   /** Whether this card has been revealed at least once */
   hasBeenSeen: boolean;
-  /** Whether this card is currently face up */
-  isFaceUp: boolean;
   /** Which player has claimed this card (-1 if unclaimed, 0-3 for player index) */
   claimedByPlayer: number;
   /** Position in the grid */
