@@ -68,10 +68,17 @@ export function GameBoard({ gameState, onCardClick, onNewGame, isProcessing }: G
           const collectedCards = gameState.cards.filter(
             (card) => card.claimedByPlayer === player.index
           );
+          const playerBoxId = `player-box-${player.index}`;
+
+          console.log(`[GameBoard] Rendering player box ${playerBoxId}`, {
+            playerIndex: player.index,
+            collectedCardsCount: collectedCards.length,
+          });
+
           return (
             <UICard
               key={player.index}
-              id={`player-box-${player.index}`}
+              id={playerBoxId}
               className={cn(
                 'relative z-10 bg-white',
                 currentPlayer.index === player.index && !isGameComplete
@@ -165,29 +172,40 @@ export function GameBoard({ gameState, onCardClick, onNewGame, isProcessing }: G
         {gameState.cards
           .slice()
           .sort((a, b) => a.position - b.position)
-          .map((card) => (
-            <PlayingCard
-              key={card.id}
-              card={card}
-              onClick={() => onCardClick(card)}
-              size={
-                gameState.cards.length > 52
-                  ? 'small'
-                  : gameState.cards.length > 26
-                    ? 'medium'
-                    : 'medium'
-              }
-              playerBoxId={
-                card.claimedByPlayer !== -1 ? `player-box-${card.claimedByPlayer}` : undefined
-              }
-              disabled={
-                isProcessing ||
-                currentPlayer.type === 'ai' ||
-                isGameComplete ||
-                gameState.currentlyFlippedCards.length >= gameState.config.matchSize
-              }
-            />
-          ))}
+          .map((card) => {
+            const playerBoxId =
+              card.claimedByPlayer !== -1 ? `player-box-${card.claimedByPlayer}` : undefined;
+
+            if (card.claimedByPlayer !== -1) {
+              console.log(`[GameBoard] Rendering claimed card ${card.id}`, {
+                claimedByPlayer: card.claimedByPlayer,
+                playerBoxId,
+                isFaceUp: card.isFaceUp,
+              });
+            }
+
+            return (
+              <PlayingCard
+                key={card.id}
+                card={card}
+                onClick={() => onCardClick(card)}
+                size={
+                  gameState.cards.length > 52
+                    ? 'small'
+                    : gameState.cards.length > 26
+                      ? 'medium'
+                      : 'medium'
+                }
+                playerBoxId={playerBoxId}
+                disabled={
+                  isProcessing ||
+                  currentPlayer.type === 'ai' ||
+                  isGameComplete ||
+                  gameState.currentlyFlippedCards.length >= gameState.config.matchSize
+                }
+              />
+            );
+          })}
       </div>
 
       {/* Debug Info (optional, can be removed) */}

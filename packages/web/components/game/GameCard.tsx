@@ -40,18 +40,48 @@ export function PlayingCard({
 
   // Handle animation when card is claimed
   useEffect(() => {
+    console.log(`[Card ${card.id}] Animation effect triggered`, {
+      isClaimed,
+      isAnimating,
+      playerBoxId,
+      claimedByPlayer: card.claimedByPlayer,
+    });
+
     if (isClaimed && !isAnimating && playerBoxId) {
+      console.log(`[Card ${card.id}] Starting animation to ${playerBoxId}`);
+
       // Use requestAnimationFrame to defer state update
       requestAnimationFrame(() => {
         setIsAnimating(true);
+        console.log(`[Card ${card.id}] Set isAnimating to true`);
 
         // Get the card's current position
         const cardElement = document.getElementById(`card-${card.id}`);
         const targetElement = document.getElementById(playerBoxId);
 
+        console.log(`[Card ${card.id}] Elements found:`, {
+          cardElement: !!cardElement,
+          targetElement: !!targetElement,
+        });
+
         if (cardElement && targetElement) {
           const cardRect = cardElement.getBoundingClientRect();
           const targetRect = targetElement.getBoundingClientRect();
+
+          console.log(`[Card ${card.id}] Positions:`, {
+            card: {
+              left: cardRect.left,
+              top: cardRect.top,
+              width: cardRect.width,
+              height: cardRect.height,
+            },
+            target: {
+              left: targetRect.left,
+              top: targetRect.top,
+              width: targetRect.width,
+              height: targetRect.height,
+            },
+          });
 
           // Calculate the translation needed
           const deltaX =
@@ -59,17 +89,30 @@ export function PlayingCard({
           const deltaY =
             targetRect.top - cardRect.top + targetRect.height / 2 - cardRect.height / 2;
 
-          setAnimationStyle({
+          console.log(`[Card ${card.id}] Deltas:`, { deltaX, deltaY });
+
+          const style = {
             transform: `translate(${deltaX}px, ${deltaY}px) scale(0.3)`,
             opacity: 0,
-          });
+          };
+          console.log(`[Card ${card.id}] Setting animation style:`, style);
+          setAnimationStyle(style);
+        } else {
+          console.error(`[Card ${card.id}] Failed to find elements!`);
         }
       });
+    } else {
+      console.log(`[Card ${card.id}] Animation conditions not met`, {
+        needsClaimed: isClaimed,
+        needsNotAnimating: !isAnimating,
+        needsPlayerBoxId: !!playerBoxId,
+      });
     }
-  }, [isClaimed, card.id, playerBoxId, isAnimating]);
+  }, [isClaimed, card.id, playerBoxId, isAnimating, card.claimedByPlayer]);
 
   // Animate claimed cards - fade and scale down
   if (isClaimed && !playerBoxId) {
+    console.log(`[Card ${card.id}] Rendering: claimed but no playerBoxId, fading out`);
     return (
       <div className={sizeClasses[size]}>
         <div className="h-full w-full scale-50 opacity-0 transition-all duration-700" />
@@ -78,12 +121,15 @@ export function PlayingCard({
   }
 
   if (isClaimed && isAnimating) {
+    console.log(`[Card ${card.id}] Rendering: claimed and animating complete, invisible`);
     return (
       <div className={sizeClasses[size]}>
         <div className="h-full w-full opacity-0" />
       </div>
     );
   }
+
+  console.log(`[Card ${card.id}] Rendering: normal card`, { isRevealed, isClaimed, isAnimating });
 
   return (
     <div
