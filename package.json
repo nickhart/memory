@@ -23,6 +23,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,md,json}\"",
     "test": "turbo test",
+    "check": "pnpm run format:check && pnpm run lint && pnpm run test && pnpm run build",
     "clean": "turbo clean && rm -rf node_modules",
     "prepare": "husky install"
   },
