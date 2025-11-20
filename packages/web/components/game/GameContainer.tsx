@@ -74,7 +74,7 @@ export function GameContainer() {
           setAiMemory(finalMemory);
 
           setIsProcessing(false);
-        }, 1000);
+        }, 1500);
       } else {
         setIsProcessing(false);
       }

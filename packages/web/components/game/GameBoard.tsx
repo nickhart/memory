@@ -96,10 +96,23 @@ export function GameBoard({ gameState, onCardClick, onNewGame, isProcessing }: G
       {!isGameComplete && (
         <UICard className="mb-6 bg-blue-50">
           <CardContent className="p-4">
-            <p className="text-lg">
-              <strong>{currentPlayer.name}'s</strong> turn
-              {currentPlayer.type === 'ai' && <span className="ml-2">(AI is thinking...)</span>}
-            </p>
+            {isProcessing &&
+            gameState.currentlyFlippedCards.length === gameState.config.matchSize ? (
+              <p className="text-lg">
+                <strong>Checking for match...</strong>
+              </p>
+            ) : (
+              <p className="text-lg">
+                <strong>{currentPlayer.name}'s</strong> turn
+                {currentPlayer.type === 'ai' && <span className="ml-2">(AI is thinking...)</span>}
+                {gameState.currentlyFlippedCards.length > 0 && (
+                  <span className="ml-2 text-sm text-gray-600">
+                    ({gameState.currentlyFlippedCards.length}/{gameState.config.matchSize} cards
+                    flipped)
+                  </span>
+                )}
+              </p>
+            )}
           </CardContent>
         </UICard>
       )}
@@ -124,8 +137,7 @@ export function GameBoard({ gameState, onCardClick, onNewGame, isProcessing }: G
                 isProcessing ||
                 currentPlayer.type === 'ai' ||
                 isGameComplete ||
-                (gameState.currentlyFlippedCards.length >= gameState.config.matchSize &&
-                  !card.isFaceUp)
+                gameState.currentlyFlippedCards.length >= gameState.config.matchSize
               }
             />
           ))}
