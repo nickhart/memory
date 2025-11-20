@@ -120,7 +120,12 @@ export function GameBoard({ gameState, onCardClick, onNewGame, isProcessing }: G
               key={card.id}
               card={card}
               onClick={() => onCardClick(card)}
-              disabled={isProcessing || currentPlayer.type === 'ai' || isGameComplete}
+              disabled={
+                isProcessing ||
+                currentPlayer.type === 'ai' ||
+                isGameComplete ||
+                gameState.currentlyFlippedCards.length >= gameState.config.matchSize
+              }
             />
           ))}
       </div>

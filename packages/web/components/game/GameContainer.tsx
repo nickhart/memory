@@ -38,6 +38,11 @@ export function GameContainer() {
     (card: Card) => {
       if (!gameState || isProcessing) return;
 
+      // Don't allow flipping if we've already flipped the maximum number of cards
+      if (gameState.currentlyFlippedCards.length >= gameState.config.matchSize) {
+        return;
+      }
+
       setIsProcessing(true);
 
       // Flip the card
