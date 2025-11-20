@@ -1,0 +1,44 @@
+{
+  "name": "memory",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A modern, open-source Memory card game with web, mobile, and CLI support",
+  "keywords": [
+    "memory-game",
+    "card-game",
+    "nextjs",
+    "react",
+    "typescript",
+    "monorepo"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nickhart/memory"
+  },
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "lint": "turbo lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,md,json}\"",
+    "test": "turbo test",
+    "clean": "turbo clean && rm -rf node_modules",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "husky": "^8.0.0",
+    "lint-staged": "^15.0.0",
+    "prettier": "^3.1.0",
+    "turbo": "^2.0.0",
+    "typescript": "^5.3.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,json,md}": "prettier --write"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.15.0"
+}
