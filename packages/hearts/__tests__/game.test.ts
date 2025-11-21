@@ -147,7 +147,7 @@ describe('selectCardToPass', () => {
     expect(state.players[0].isReady).toBe(true);
   });
 
-  it('should throw error when trying to select more than 3 cards', () => {
+  it('should not allow selecting more than 3 cards', () => {
     const game = createGame(['Alice', 'Bob', 'Charlie', 'Diana']);
     let state = dealCards(game);
 
@@ -158,9 +158,10 @@ describe('selectCardToPass', () => {
     state = selectCardToPass(state, player.id, cards[1]);
     state = selectCardToPass(state, player.id, cards[2]);
 
-    expect(() => selectCardToPass(state, player.id, cards[3])).toThrow(
-      'Can only select 3 cards to pass'
-    );
+    // Trying to select a 4th card should return unchanged state
+    const stateAfter = selectCardToPass(state, player.id, cards[3]);
+    expect(stateAfter.players[0].selectedCards).toHaveLength(3);
+    expect(stateAfter.players[0].selectedCards).toEqual([cards[0], cards[1], cards[2]]);
   });
 
   it('should allow deselecting a card', () => {
@@ -175,6 +176,27 @@ describe('selectCardToPass', () => {
 
     state = selectCardToPass(state, player.id, card);
     expect(state.players[0].selectedCards).toHaveLength(0);
+  });
+
+  it('should allow deselecting a card even when 3 cards are selected', () => {
+    const game = createGame(['Alice', 'Bob', 'Charlie', 'Diana']);
+    let state = dealCards(game);
+
+    const player = state.players[0];
+    const cards = player.hand.slice(0, 3).map((c) => c.id);
+
+    // Select 3 cards
+    state = selectCardToPass(state, player.id, cards[0]);
+    state = selectCardToPass(state, player.id, cards[1]);
+    state = selectCardToPass(state, player.id, cards[2]);
+    expect(state.players[0].selectedCards).toHaveLength(3);
+    expect(state.players[0].isReady).toBe(true);
+
+    // Should be able to deselect one of them
+    state = selectCardToPass(state, player.id, cards[1]);
+    expect(state.players[0].selectedCards).toHaveLength(2);
+    expect(state.players[0].selectedCards).toEqual([cards[0], cards[2]]);
+    expect(state.players[0].isReady).toBe(false);
   });
 
   it('should throw error if not in Passing phase', () => {

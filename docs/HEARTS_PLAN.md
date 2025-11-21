@@ -236,6 +236,12 @@ export interface GameState {
   - Card passing animation
   - Trick completion animation
   - Score updates
+- [ ] **Claim the rest** feature
+  - Analyze remaining cards to determine if player can lose any tricks
+  - Show "Claim Rest" button when player cannot lose
+  - Algorithm: Check if player has highest card in each remaining suit
+  - Auto-play remaining tricks if claim is valid
+  - Prevent claiming if any uncertainty exists
 
 ### Phase 4: AI Implementation
 

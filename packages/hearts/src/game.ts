@@ -173,9 +173,10 @@ export function selectCardToPass(state: GameState, playerId: string, cardId: str
     // Deselect the card
     selectedCards = player.selectedCards.filter((id) => id !== cardId);
   } else {
-    // Can only select 3 cards
+    // Can only select 3 cards (only check when trying to ADD a new card)
     if (player.selectedCards.length >= 3) {
-      throw new Error('Can only select 3 cards to pass');
+      // Already have 3 cards, can't add more
+      return state; // Return unchanged state instead of throwing
     }
     selectedCards = [...player.selectedCards, cardId];
   }
