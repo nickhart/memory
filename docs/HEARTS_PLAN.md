@@ -4,7 +4,7 @@
 
 Hearts is a trick-taking card game for 4 players where the goal is to avoid taking hearts (1 point each) and the Queen of Spades (13 points). Players can "shoot the moon" by taking all penalty cards to give everyone else 26 points instead.
 
-**Current Status (Phase 2)**: Core game logic is fully implemented and tested. Basic UI exists at `/hearts` route but is read-only. Next step is to add interactivity and AI players.
+**Current Status (Phase 3)**: Core game logic is fully implemented and tested. Interactive UI is complete with card play animations and score tracking. Human players can play against 3 AI opponents (RandomAI and SimpleAI). Game flow is fully automated with smooth AI turn progression.
 
 ## Why Hearts Tests Our Infrastructure
 
@@ -201,41 +201,46 @@ export interface GameState {
 - [x] Implement scoring logic
 - [x] Write comprehensive tests (50+ tests)
 
-### Phase 2: Basic UI (In Progress)
+### Phase 2: Basic UI ✓
 
 - [ ] Create HandComponent in card-game-ui (fanned card display)
-- [x] Create HeartsContainer (basic version)
-- [x] Create HeartsBoard with 4-player layout (read-only)
-- [ ] Implement PassingPhase UI (interactive card selection)
-- [ ] Implement PlayingPhase UI (interactive card playing)
+- [x] Create HeartsContainer (with AI orchestration)
+- [x] Create HeartsBoard with 4-player layout
+- [x] Implement PassingPhase UI (interactive card selection)
+- [x] Implement PlayingPhase UI (interactive card playing)
 - [x] Add to /hearts route
 - [x] Add Hearts card to home page
 
-**Current Status**: Route exists, shows game state, but lacks interactivity
+**Status**: Fully playable with interactive UI and AI opponents
 
 ### Phase 3: Game Flow Automation & Interactivity
 
-- [ ] Add interactive card selection in PassingPhase
+- [x] Add interactive card selection in PassingPhase
   - Click to select/deselect cards (3 card limit)
   - Visual indicators for selected cards
   - "Pass Cards" confirmation button
   - Integrate with `selectCardToPass()` and `executePass()`
-- [ ] Add interactive card playing in PlayingPhase
+- [x] Add interactive card playing in PlayingPhase
   - Click to play cards from hand
   - Highlight valid plays using `getValidPlays()`
   - Disable invalid cards
   - Show current player's turn clearly
-- [ ] Implement game flow orchestration
+- [x] Implement game flow orchestration
   - Auto-trigger AI moves after human plays
   - Auto-complete tricks when 4 cards played (call `completeTrick()`)
   - Add delays/animations between AI moves
   - Handle phase transitions automatically
   - Show trick winner before clearing to next trick
-- [ ] Add animations
-  - Card dealing animation
-  - Card passing animation
-  - Trick completion animation
-  - Score updates
+- [x] Add animations
+  - Card play animation (card moves to trick position)
+  - ~~Card dealing animation~~
+  - ~~Card passing animation~~
+  - ~~Trick completion animation~~
+  - ~~Score updates~~
+- [x] Add score tracking UI
+  - Show current trick points with badge
+  - Show detailed score tracking toggle
+  - Display points taken this hand per player when toggle is on
 - [ ] **Claim the rest** feature
   - Analyze remaining cards to determine if player can lose any tricks
   - Show "Claim Rest" button when player cannot lose
@@ -243,14 +248,14 @@ export interface GameState {
   - Auto-play remaining tricks if claim is valid
   - Prevent claiming if any uncertainty exists
 
-### Phase 4: AI Implementation
+### Phase 4: AI Implementation (In Progress)
 
 #### 4.1: Basic AI Strategies
 
-- [ ] **RandomAI** (baseline)
+- [x] **RandomAI** (baseline)
   - Random valid card selection for passing
   - Random valid card play
-- [ ] **BasicAI** (defensive heuristics)
+- [x] **SimpleAI** (defensive heuristics)
   - Passing: High cards, high hearts, Queen of Spades
   - Playing: Avoid taking tricks with points, duck when possible
   - Lead low cards when safe
@@ -265,9 +270,9 @@ export interface GameState {
 
 #### 4.2: AI Infrastructure
 
-- [ ] Create AI interface/strategy pattern
+- [x] Create AI interface/strategy pattern
 - [ ] Add configurable AI difficulty
-- [ ] AI decision delay (realistic thinking time)
+- [x] AI decision delay (realistic thinking time)
 - [ ] AI decision explanation (debug mode)
 
 ### Phase 5: CLI Tools & Testing

@@ -1,6 +1,15 @@
 'use client';
 
-import { GameState, GamePhase, Player, HeartsCard, getValidPlays } from '@memory/hearts';
+import { useState } from 'react';
+import {
+  GameState,
+  GamePhase,
+  Player,
+  HeartsCard,
+  getValidPlays,
+  getTrickPoints,
+  getPointValue,
+} from '@memory/hearts';
 import { getCardDisplay } from '@memory/card-game-core';
 import { Card as GenericCard } from '@memory/card-game-ui';
 import { Card as UICard, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,8 +35,15 @@ export function HeartsBoard({
   onNewHand,
   onNewGame,
 }: HeartsBoardProps) {
+  const [showDetailedScores, setShowDetailedScores] = useState(false);
+  const [animatingCardId, setAnimatingCardId] = useState<string | null>(null);
+
   const renderPlayer = (player: Player, _position: string) => {
     const isCurrentPlayer = gameState.players[gameState.currentPlayerIndex]?.id === player.id;
+    const trickPoints = player.tricksTaken.reduce(
+      (sum, trickCards) => sum + trickCards.reduce((pts, card) => pts + getPointValue(card), 0),
+      0
+    );
 
     return (
       <div className="space-y-2">
@@ -43,6 +59,11 @@ export function HeartsBoard({
             {player.handScore > 0 && (
               <Badge variant="secondary" className="text-xs">
                 +{player.handScore}
+              </Badge>
+            )}
+            {showDetailedScores && trickPoints > 0 && (
+              <Badge variant="destructive" className="text-xs">
+                {trickPoints} pts this hand
               </Badge>
             )}
           </div>
@@ -65,12 +86,22 @@ export function HeartsBoard({
       : [];
   const validPlayIds = new Set(validPlays.map((c) => c.id));
 
+  const handleCardPlay = (cardId: string) => {
+    setAnimatingCardId(cardId);
+    // Delay the actual play to allow animation to start
+    setTimeout(() => {
+      onCardPlay(cardId);
+      setAnimatingCardId(null);
+    }, 300);
+  };
+
   const renderHand = (cards: HeartsCard[]) => {
     return (
       <div className="flex gap-2 flex-wrap justify-center">
         {cards.map((card) => {
           const isSelected = humanPlayer.selectedCards.includes(card.id);
           const isValidPlay = validPlayIds.has(card.id);
+          const isAnimating = animatingCardId === card.id;
           const isClickable =
             gameState.phase === GamePhase.Passing ||
             (gameState.phase === GamePhase.Playing && isHumanTurn && isValidPlay);
@@ -78,14 +109,16 @@ export function HeartsBoard({
           return (
             <div
               key={card.id}
-              className={`transition-transform ${isSelected ? '-translate-y-3' : ''} ${
-                isClickable ? 'cursor-pointer hover:scale-105' : ''
-              } ${!isClickable && gameState.phase === GamePhase.Playing ? 'opacity-50' : ''}`}
+              className={`transition-all duration-300 ${isSelected ? '-translate-y-3' : ''} ${
+                isAnimating ? 'opacity-0 scale-75 -translate-y-20' : ''
+              } ${isClickable ? 'cursor-pointer hover:scale-105' : ''} ${
+                !isClickable && gameState.phase === GamePhase.Playing ? 'opacity-50' : ''
+              }`}
               onClick={() => {
                 if (gameState.phase === GamePhase.Passing) {
                   onCardSelect(card.id);
-                } else if (gameState.phase === GamePhase.Playing && isValidPlay) {
-                  onCardPlay(card.id);
+                } else if (gameState.phase === GamePhase.Playing && isValidPlay && !isAnimating) {
+                  handleCardPlay(card.id);
                 }
               }}
             >
@@ -123,12 +156,25 @@ export function HeartsBoard({
               <CardTitle>Hearts</CardTitle>
               <p className="text-sm text-muted-foreground mt-1">
                 Hand #{gameState.handNumber + 1} • {gameState.phase}
-                {gameState.heartsBroken && ' • ❤️ Broken'}
+                {gameState.heartsBroken && (
+                  <Badge variant="destructive" className="ml-2 text-xs">
+                    ❤️ Broken
+                  </Badge>
+                )}
               </p>
             </div>
-            <Button onClick={onNewGame} variant="outline">
-              New Game
-            </Button>
+            <div className="flex items-center gap-4">
+              <Button
+                onClick={() => setShowDetailedScores(!showDetailedScores)}
+                variant={showDetailedScores ? 'default' : 'outline'}
+                size="sm"
+              >
+                {showDetailedScores ? '👁️ Hide' : '👁️ Show'} Details
+              </Button>
+              <Button onClick={onNewGame} variant="outline">
+                New Game
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-8">
@@ -142,7 +188,14 @@ export function HeartsBoard({
           {/* Current Trick */}
           {gameState.currentTrick.cards.length > 0 && (
             <div className="bg-muted rounded-lg p-4">
-              <h3 className="text-sm font-semibold mb-2 text-center">Current Trick</h3>
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <h3 className="text-sm font-semibold text-center">Current Trick</h3>
+                {getTrickPoints(gameState.currentTrick) > 0 && (
+                  <Badge variant="destructive" className="text-xs">
+                    {getTrickPoints(gameState.currentTrick)} pts
+                  </Badge>
+                )}
+              </div>
               <div className="flex gap-2 justify-center">
                 {gameState.currentTrick.cards.map(({ playerId, card }) => {
                   const player = gameState.players.find((p) => p.id === playerId);

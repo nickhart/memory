@@ -152,3 +152,10 @@ export function trickContainsHearts(trick: Trick): boolean {
 export function trickContainsPoints(trick: Trick): boolean {
   return trick.cards.some((c) => getPointValue(c.card) > 0);
 }
+
+/**
+ * Calculate total points in the trick
+ */
+export function getTrickPoints(trick: Trick): number {
+  return trick.cards.reduce((total, c) => total + getPointValue(c.card), 0);
+}

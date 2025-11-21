@@ -32,6 +32,7 @@ export {
   determineTrickWinner,
   trickContainsHearts,
   trickContainsPoints,
+  getTrickPoints,
 } from './trick';
 
 // Scoring
