@@ -60,6 +60,9 @@ export function HeartsContainer() {
   useEffect(() => {
     if (gameState.phase !== GamePhase.Playing) return;
 
+    // Don't play if trick is already complete
+    if (gameState.currentTrick.cards.length >= 4) return;
+
     const currentPlayer = gameState.players[gameState.currentPlayerIndex];
     const isAITurn = gameState.currentPlayerIndex !== HUMAN_PLAYER_INDEX;
 
