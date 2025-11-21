@@ -36,3 +36,6 @@ export {
 
 // Scoring
 export { getPointValue, calculateHandScore, checkShootMoon, applyScores } from './scoring';
+
+// AI
+export { AIStrategy, RandomAI, createDefaultAI } from './ai';

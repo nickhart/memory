@@ -1,6 +1,6 @@
 'use client';
 
-import { GameState, GamePhase, Player, HeartsCard } from '@memory/hearts';
+import { GameState, GamePhase, Player, HeartsCard, getValidPlays } from '@memory/hearts';
 import { getCardDisplay } from '@memory/card-game-core';
 import { Card as GenericCard } from '@memory/card-game-ui';
 import { Card as UICard, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,16 +9,33 @@ import { Badge } from '@/components/ui/badge';
 
 interface HeartsBoardProps {
   gameState: GameState;
+  onCardSelect: (cardId: string) => void;
+  onConfirmPass: () => void;
   onCardPlay: (cardId: string) => void;
+  onNewHand: () => void;
   onNewGame: () => void;
 }
 
-export function HeartsBoard({ gameState, onNewGame }: HeartsBoardProps) {
+const HUMAN_PLAYER_INDEX = 0;
+
+export function HeartsBoard({
+  gameState,
+  onCardSelect,
+  onConfirmPass,
+  onCardPlay,
+  onNewHand,
+  onNewGame,
+}: HeartsBoardProps) {
   const renderPlayer = (player: Player, _position: string) => {
+    const isCurrentPlayer = gameState.players[gameState.currentPlayerIndex]?.id === player.id;
+
     return (
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold">{player.name}</h3>
+          <h3 className={`text-sm font-semibold ${isCurrentPlayer ? 'text-primary' : ''}`}>
+            {player.name}
+            {isCurrentPlayer && gameState.phase === GamePhase.Playing && ' ⭐'}
+          </h3>
           <div className="flex items-center gap-2">
             <Badge variant="outline" className="text-xs">
               Score: {player.score}
@@ -32,34 +49,67 @@ export function HeartsBoard({ gameState, onNewGame }: HeartsBoardProps) {
         </div>
         <div className="text-xs text-muted-foreground">
           {player.hand.length} cards • {player.tricksTaken.length} tricks
+          {gameState.phase === GamePhase.Passing && player.isReady && ' • Ready'}
         </div>
       </div>
     );
   };
 
-  const humanPlayer = gameState.players[0];
+  const humanPlayer = gameState.players[HUMAN_PLAYER_INDEX];
+  const isHumanTurn = gameState.currentPlayerIndex === HUMAN_PLAYER_INDEX;
+
+  // Get valid plays for human player
+  const validPlays =
+    gameState.phase === GamePhase.Playing && isHumanTurn
+      ? getValidPlays(gameState, humanPlayer.id)
+      : [];
+  const validPlayIds = new Set(validPlays.map((c) => c.id));
 
   const renderHand = (cards: HeartsCard[]) => {
     return (
       <div className="flex gap-2 flex-wrap justify-center">
-        {cards.map((card) => (
-          <GenericCard
-            key={card.id}
-            card={card}
-            frontContent={
-              <div className="flex h-full w-full items-center justify-center text-2xl font-bold">
-                {getCardDisplay(card)}
-              </div>
-            }
-            backContent={
-              <div className="flex h-full w-full items-center justify-center bg-blue-600 text-white text-xl">
-                🂠
-              </div>
-            }
-            size="medium"
-            disabled
-          />
-        ))}
+        {cards.map((card) => {
+          const isSelected = humanPlayer.selectedCards.includes(card.id);
+          const isValidPlay = validPlayIds.has(card.id);
+          const isClickable =
+            (gameState.phase === GamePhase.Passing && !humanPlayer.isReady) ||
+            (gameState.phase === GamePhase.Playing && isHumanTurn && isValidPlay);
+
+          return (
+            <div
+              key={card.id}
+              className={`transition-transform ${isSelected ? '-translate-y-3' : ''} ${
+                isClickable ? 'cursor-pointer hover:scale-105' : ''
+              } ${!isClickable && gameState.phase === GamePhase.Playing ? 'opacity-50' : ''}`}
+              onClick={() => {
+                if (gameState.phase === GamePhase.Passing && !humanPlayer.isReady) {
+                  onCardSelect(card.id);
+                } else if (gameState.phase === GamePhase.Playing && isValidPlay) {
+                  onCardPlay(card.id);
+                }
+              }}
+            >
+              <GenericCard
+                card={card}
+                frontContent={
+                  <div className="flex h-full w-full items-center justify-center text-2xl font-bold">
+                    {getCardDisplay(card)}
+                  </div>
+                }
+                backContent={
+                  <div className="flex h-full w-full items-center justify-center bg-blue-600 text-white text-xl">
+                    🂠
+                  </div>
+                }
+                size="medium"
+                disabled={false}
+              />
+              {isSelected && (
+                <div className="text-center text-xs mt-1 font-semibold text-primary">Selected</div>
+              )}
+            </div>
+          );
+        })}
       </div>
     );
   };
@@ -72,8 +122,8 @@ export function HeartsBoard({ gameState, onNewGame }: HeartsBoardProps) {
             <div>
               <CardTitle>Hearts</CardTitle>
               <p className="text-sm text-muted-foreground mt-1">
-                Hand #{gameState.handNumber} • {gameState.phase}
-                {gameState.heartsBroken && ' • Hearts Broken'}
+                Hand #{gameState.handNumber + 1} • {gameState.phase}
+                {gameState.heartsBroken && ' • ❤️ Broken'}
               </p>
             </div>
             <Button onClick={onNewGame} variant="outline">
@@ -85,7 +135,7 @@ export function HeartsBoard({ gameState, onNewGame }: HeartsBoardProps) {
           {/* Other Players */}
           <div className="grid grid-cols-3 gap-4">
             {gameState.players.slice(1).map((player, idx) => (
-              <div key={player.id}>{renderPlayer(player, ['Left', 'Across', 'Right'][idx])}</div>
+              <div key={player.id}>{renderPlayer(player, ['West', 'North', 'East'][idx])}</div>
             ))}
           </div>
 
@@ -122,46 +172,82 @@ export function HeartsBoard({ gameState, onNewGame }: HeartsBoardProps) {
             {renderHand(humanPlayer.hand)}
           </div>
 
-          {/* Status Messages */}
+          {/* Status Messages & Actions */}
           {gameState.phase === GamePhase.Passing && (
+            <div className="flex flex-col items-center gap-2">
+              <Badge variant="outline" className="text-sm py-2 px-4">
+                Pass {humanPlayer.selectedCards.length}/3 cards {gameState.passDirection}
+              </Badge>
+              {humanPlayer.selectedCards.length === 3 && !humanPlayer.isReady && (
+                <Button onClick={onConfirmPass} size="lg">
+                  Confirm Pass
+                </Button>
+              )}
+              {humanPlayer.isReady && (
+                <Badge variant="secondary" className="text-sm py-2 px-4">
+                  Waiting for other players...
+                </Badge>
+              )}
+            </div>
+          )}
+
+          {gameState.phase === GamePhase.Playing && !isHumanTurn && (
             <div className="flex justify-center">
               <Badge variant="outline" className="text-sm py-2 px-4">
-                Passing phase - Pass direction: {gameState.passDirection}
+                Waiting for {gameState.players[gameState.currentPlayerIndex]?.name}...
+              </Badge>
+            </div>
+          )}
+
+          {gameState.phase === GamePhase.Playing && isHumanTurn && (
+            <div className="flex justify-center">
+              <Badge variant="default" className="text-sm py-2 px-4">
+                Your turn! Click a card to play
               </Badge>
             </div>
           )}
 
           {gameState.phase === GamePhase.HandComplete && (
-            <div className="flex justify-center">
-              <Badge variant="secondary" className="text-sm py-2 px-4">
-                Hand Complete - Click New Game to continue
+            <div className="flex flex-col items-center gap-4">
+              <Badge variant="secondary" className="text-lg py-2 px-4">
+                Hand Complete
               </Badge>
+              <div className="text-center">
+                <p className="text-sm font-semibold mb-2">Scores this hand:</p>
+                {gameState.players.map((p) => (
+                  <p key={p.id} className="text-sm">
+                    {p.name}: +{p.handScore} points (Total: {p.score})
+                  </p>
+                ))}
+              </div>
+              <Button onClick={onNewHand} size="lg">
+                Start Next Hand
+              </Button>
             </div>
           )}
 
           {gameState.phase === GamePhase.GameOver && (
-            <div className="flex justify-center flex-col items-center gap-2">
-              <Badge variant="default" className="text-lg py-2 px-4">
+            <div className="flex justify-center flex-col items-center gap-4">
+              <Badge variant="default" className="text-xl py-3 px-6">
                 Game Over
               </Badge>
-              <p className="text-sm text-muted-foreground">
-                Winner: {gameState.players.reduce((min, p) => (p.score < min.score ? p : min)).name}
-              </p>
+              <div className="text-center">
+                <p className="text-lg font-semibold mb-2">Final Scores:</p>
+                {gameState.players
+                  .slice()
+                  .sort((a, b) => a.score - b.score)
+                  .map((p, idx) => (
+                    <p
+                      key={p.id}
+                      className={`text-sm ${idx === 0 ? 'text-primary font-bold text-lg' : ''}`}
+                    >
+                      {idx === 0 && '🏆 '}
+                      {p.name}: {p.score} points
+                    </p>
+                  ))}
+              </div>
             </div>
           )}
-        </CardContent>
-      </UICard>
-
-      {/* Info Card */}
-      <UICard className="mt-4">
-        <CardContent className="pt-6">
-          <div className="text-center text-sm text-muted-foreground">
-            <p className="font-semibold mb-2">Coming Soon</p>
-            <p>
-              Full Hearts gameplay is under development. The game logic is implemented but the
-              interactive UI for card passing and playing is still being built.
-            </p>
-          </div>
         </CardContent>
       </UICard>
     </div>
