@@ -54,6 +54,28 @@ export default function Home() {
             </CardContent>
           </Card>
         </Link>
+
+        <Link href="/hearts" className="transition-transform hover:scale-105">
+          <Card className="h-full cursor-pointer border-2 hover:border-primary">
+            <CardHeader>
+              <CardTitle>Hearts</CardTitle>
+              <CardDescription>Avoid hearts and the Queen of Spades</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Classic trick-taking game. Try to avoid penalty cards or shoot the moon!
+              </p>
+              <div className="mt-4 flex gap-2">
+                <span className="rounded-full bg-red-100 px-2 py-1 text-xs text-red-700">
+                  4 Players
+                </span>
+                <span className="rounded-full bg-orange-100 px-2 py-1 text-xs text-orange-700">
+                  Coming Soon
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
       </div>
     </div>
   );
