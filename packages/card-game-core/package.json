@@ -1,10 +1,28 @@
 {
   "name": "@memory/card-game-core",
   "version": "0.1.0",
-  "description": "Core types and utilities for card games",
+  "description": "Core types and utilities for building card games with TypeScript",
+  "keywords": [
+    "cards",
+    "deck",
+    "playing-cards",
+    "game",
+    "typescript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/memory.git",
+    "directory": "packages/card-game-core"
+  },
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
