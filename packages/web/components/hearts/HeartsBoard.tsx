@@ -178,14 +178,15 @@ export function HeartsBoard({
               <Badge variant="outline" className="text-sm py-2 px-4">
                 Pass {humanPlayer.selectedCards.length}/3 cards {gameState.passDirection}
               </Badge>
-              {humanPlayer.selectedCards.length === 3 && !humanPlayer.isReady && (
+              {humanPlayer.selectedCards.length === 3 && humanPlayer.isReady && (
                 <Button onClick={onConfirmPass} size="lg">
                   Confirm Pass
                 </Button>
               )}
-              {humanPlayer.isReady && (
-                <Badge variant="secondary" className="text-sm py-2 px-4">
-                  Waiting for other players...
+              {humanPlayer.selectedCards.length < 3 && (
+                <Badge variant="secondary" className="text-xs py-1 px-3">
+                  Select {3 - humanPlayer.selectedCards.length} more card
+                  {3 - humanPlayer.selectedCards.length !== 1 ? 's' : ''}
                 </Badge>
               )}
             </div>

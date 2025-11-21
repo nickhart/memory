@@ -38,4 +38,4 @@ export {
 export { getPointValue, calculateHandScore, checkShootMoon, applyScores } from './scoring';
 
 // AI
-export { AIStrategy, RandomAI, createDefaultAI } from './ai';
+export { AIStrategy, RandomAI, SimpleAI, createDefaultAI } from './ai';
