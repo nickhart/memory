@@ -72,7 +72,7 @@ export function HeartsBoard({
           const isSelected = humanPlayer.selectedCards.includes(card.id);
           const isValidPlay = validPlayIds.has(card.id);
           const isClickable =
-            (gameState.phase === GamePhase.Passing && !humanPlayer.isReady) ||
+            gameState.phase === GamePhase.Passing ||
             (gameState.phase === GamePhase.Playing && isHumanTurn && isValidPlay);
 
           return (
@@ -82,7 +82,7 @@ export function HeartsBoard({
                 isClickable ? 'cursor-pointer hover:scale-105' : ''
               } ${!isClickable && gameState.phase === GamePhase.Playing ? 'opacity-50' : ''}`}
               onClick={() => {
-                if (gameState.phase === GamePhase.Passing && !humanPlayer.isReady) {
+                if (gameState.phase === GamePhase.Passing) {
                   onCardSelect(card.id);
                 } else if (gameState.phase === GamePhase.Playing && isValidPlay) {
                   onCardPlay(card.id);
